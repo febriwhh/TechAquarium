@@ -1,12 +1,54 @@
+<link rel="stylesheet" href="style.css">
+<script src="script.js"></script>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+
+    <title>TechAquarium</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <h1>Hello, World!</h1>
+
+    <header>
+        <h1>🐟TechAquarium</h1>
+        <p>Smart Aquarium System</p>
+    </header>
+
+    <main>
+
+        <!-- Temperature -->
+        <section>
+            <h2>🌡️Temperature</h2>
+            <p id="temperature">-- °C</p>
+            <p id="temperature-status">Waiting for sensor...</p>
+        </section>
+
+        <!-- Feeding -->
+        <section>
+            <h2>🍽️Feeding Control</h2>
+
+            <button id="feedButton">
+                FEED NOW
+            </button>
+
+            <p id="feedStatus">Feeder ready</p>
+        </section>
+
+        <!-- Schedule -->
+        <section>
+            <h2>⏰Feeding Schedule</h2>
+
+            <p>Next Feeding:</p>
+            <p id="nextFeeding">--:--</p>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
 
 </body>
 </html>
