@@ -43,11 +43,11 @@ main {
     border-radius: 15px;
     border: 1px solid #334155;
 
-    transition: transform 0.3s, Linear 0.3s;
+    transition: transform 0.2s, linear 0.2s;
 }
 
 .card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     border-color: #475569;
 }
 
