@@ -1,54 +1,93 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>TechAquarium</title>
+```
+<title>TechAquarium</title>
 
-    <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css">
+```
+
 </head>
 
 <body>
 
-    <header>
-        <h1>🐟TechAquarium</h1>
-        <p>Smart Aquarium System</p>
-    </header>
+```
+<header>
+    <h1>🐟 TechAquarium</h1>
+    <p>Smart Aquarium System</p>
+</header>
 
-    <main>
+<main>
 
-        <!-- Temperature -->
-        <section>
-            <h2>🌡️Temperature</h2>
+    <!-- Temperature -->
+    <section class="card">
+        <h2>🌡️ Temperature</h2>
+
+        <div class="temperature-box">
             <p id="temperature">-- °C</p>
             <p id="temperature-status">Waiting for sensor...</p>
-        </section>
+        </div>
+    </section>
 
-        <!-- Feeding -->
-        <section>
-            <h2>🍽️Feeding Control</h2>
 
-            <button id="feedButton">
-                FEED NOW
-            </button>
+    <!-- Feeding -->
+    <section class="card">
+        <h2>🍽️ Feeding Control</h2>
 
-            <p id="feedStatus" style="margin-top: 12px;">
-                Feeder ready
-            </p>
-        </section>
+        <button id="feedButton">
+            FEED NOW
+        </button>
 
-        <!-- Schedule -->
-        <section>
-            <h2>⏰Feeding Schedule</h2>
+        <p id="feedStatus">
+            Feeder ready
+        </p>
+    </section>
 
-            <p>Next Feeding:</p>
-            <p id="nextFeeding">--:--</p>
-        </section>
 
-    </main>
+    <!-- Schedule -->
+    <section class="card">
+        <h2>⏰ Feeding Schedule</h2>
 
-    <script src="script.js"></script>
+        <p class="label">Next Feeding</p>
+
+        <p id="nextFeeding">--:--</p>
+    </section>
+
+
+    <!-- System Status -->
+    <section class="card">
+        <h2>⚙️ System Status</h2>
+
+        <div class="status-row">
+            <span>ESP32</span>
+            <span id="espStatus" class="status offline">
+                Offline
+            </span>
+        </div>
+
+        <div class="status-row">
+            <span>Temperature Sensor</span>
+            <span id="sensorStatus" class="status offline">
+                Waiting
+            </span>
+        </div>
+
+        <div class="status-row">
+            <span>Feeder</span>
+            <span id="feederStatus" class="status online">
+                Ready
+            </span>
+        </div>
+    </section>
+
+</main>
+
+<script src="script.js"></script>
+```
 
 </body>
 </html>

@@ -12,14 +12,15 @@ body {
 }
 
 header {
-    padding: 50px;
+    padding: 45px 20px;
     text-align: center;
     background: #111827;
+    border-bottom: 1px solid #334155;
 }
 
 header h1 {
-    font-size: 50px;
-    margin-bottom: 8px; 
+    font-size: 42px;
+    margin-bottom: 8px;
 }
 
 header p {
@@ -36,14 +37,21 @@ main {
     gap: 20px;
 }
 
-section {
+.card {
     background: #1e293b;
     padding: 25px;
     border-radius: 15px;
     border: 1px solid #334155;
+
+    transition: transform 0.2s, border-color 0.2s;
 }
 
-section h2 {
+.card:hover {
+    transform: translateY(-3px);
+    border-color: #475569;
+}
+
+.card h2 {
     margin-bottom: 20px;
 }
 
@@ -57,14 +65,10 @@ section h2 {
     color: #94a3b8;
 }
 
-#feedStatus {
-    color: #94a3b8;
-    margin-top: 12px;
-}
-
 button {
     width: 100%;
     padding: 15px;
+
     border: none;
     border-radius: 10px;
 
@@ -75,10 +79,28 @@ button {
     font-weight: bold;
 
     cursor: pointer;
+
+    transition: 0.2s;
 }
 
 button:hover {
     background: #1d4ed8;
+    transform: scale(1.02);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+#feedStatus {
+    color: #94a3b8;
+    margin-top: 12px;
+    text-align: center;
+}
+
+.label {
+    color: #94a3b8;
+    margin-bottom: 5px;
 }
 
 #nextFeeding {
@@ -86,8 +108,41 @@ button:hover {
     font-weight: bold;
 }
 
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #334155;
+}
+
+.status-row:last-child {
+    border-bottom: none;
+}
+
+.status {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.online {
+    color: #22c55e;
+}
+
+.offline {
+    color: #f59e0b;
+}
+
 @media (max-width: 700px) {
+
+    header h1 {
+        font-size: 32px;
+    }
+
     main {
         grid-template-columns: 1fr;
+        margin-top: 20px;
     }
 }
