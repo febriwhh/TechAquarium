@@ -15,8 +15,8 @@ const heartbeatTopic = "techaquarium/status/heartbeat";
 const broker = "wss://df8a0c1a72354a6fb5ad02c3902b1df8.s1.eu.hivemq.cloud:8884/mqtt";
 
 const options = {
-    username: "",
-    password: "",
+    username: "TechAquarium-Web",
+    password: "sandihpelitebook",
     clientId: "TechAquarium-Web-" + Math.random().toString(16).substr(2, 8)
 };
 
