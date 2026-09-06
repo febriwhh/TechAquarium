@@ -7,16 +7,21 @@ const temperatureStatus = document.getElementById("temperature-status");
 const espStatus = document.getElementById("espStatus");
 const sensorStatus = document.getElementById("sensorStatus");
 const feederStatus = document.getElementById("feederStatus");
+const feedingTime = document.getElementById("feedingTime");
+const schedulebutton = document.getElementById("scheduleButton");
+const scheduleStatus = document.getElementById("scheduleStatus");
+const nextFeedingTime = document.getElementById("nextFeeding");
+
 
 const feedTopic = "techaquarium/feeder/cmd";
 const temperatureTopic = "techaquarium/sensor/temperature";
 const heartbeatTopic = "techaquarium/status/heartbeat";
-
+const scheduleTopic = "techaquarium/feeder/schedule";
 const broker = "wss://df8a0c1a72354a6fb5ad02c3902b1df8.s1.eu.hivemq.cloud:8884/mqtt";
 
 const options = {
-    username: "TechAquarium-Web",
-    password: "sandihpelitebook",
+    username: "TechAquarium-Web", // WEB CREDENTIALS
+    password: "sandihpelitebook", // WEB CREDENTIALS
     clientId: "TechAquarium-Web-" + Math.random().toString(16).substr(2, 8)
 };
 
@@ -147,3 +152,28 @@ feedButton.addEventListener("click", function() {
     }, 3000);
 
 });
+
+schedulebutton.addEventListener("click", function() {
+    const time = feedingTime.value;
+    if (!selectedTime) {
+        scheduleStatus.textContent = "⚠️ Please select feeding time";
+        return;
+    
+    }
+
+    if (!client.connected) {
+        scheduleStatus.textContent = "⚠️ Feeder connection unavailable";
+        return;
+    }
+
+    client.publish(scheduleTopic, time);
+
+    nextFeedingTime.textContent = selectedTime;
+    scheduleStatus.textContent = "⏰ Schedule active";
+
+    console.log("⏰ Feeding schedule sent:", selectedTime);
+
+
+    
+});
+
