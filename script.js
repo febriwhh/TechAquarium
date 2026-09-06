@@ -16,7 +16,7 @@ const nextFeedingTime = document.getElementById("nextFeeding");
 const feedTopic = "techaquarium/feeder/cmd";
 const temperatureTopic = "techaquarium/sensor/temperature";
 const heartbeatTopic = "techaquarium/status/heartbeat";
-const scheduleTopic = "techaquarium/feeder/schedule";
+const scheduleTopic = "techaquarium/feederschedule";
 const broker = "wss://df8a0c1a72354a6fb5ad02c3902b1df8.s1.eu.hivemq.cloud:8884/mqtt";
 
 const options = {
