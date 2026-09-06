@@ -154,11 +154,12 @@ feedButton.addEventListener("click", function() {
 });
 
 schedulebutton.addEventListener("click", function() {
+
     const time = feedingTime.value;
-    if (!selectedTime) {
+
+    if (!time) {
         scheduleStatus.textContent = "⚠️ Please select feeding time";
         return;
-    
     }
 
     if (!client.connected) {
@@ -168,12 +169,12 @@ schedulebutton.addEventListener("click", function() {
 
     client.publish(scheduleTopic, time);
 
-    nextFeedingTime.textContent = selectedTime;
+    nextFeedingTime.textContent = time;
     scheduleStatus.textContent = "⏰ Schedule active";
 
-    console.log("⏰ Feeding schedule sent:", selectedTime);
+    console.log("⏰ Feeding schedule sent:", time);
 
 
-    
+
 });
 
