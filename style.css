@@ -50,6 +50,7 @@ header {
     backdrop-filter: blur(14px);
 }
 
+
 .header-content {
     max-width: 1000px;
 
@@ -122,21 +123,48 @@ header p {
 
     border-radius: 999px;
 
-    background:
-        rgba(34, 197, 94, 0.08);
-
-    border:
-        1px solid rgba(34, 197, 94, 0.18);
-
-    color: #86efac;
-
     font-size: 13px;
 
     font-weight: 600;
 
     white-space: nowrap;
+
+    transition:
+        color 0.25s ease,
+        background 0.25s ease,
+        border-color 0.25s ease;
 }
 
+
+/* ONLINE */
+
+.connection-status.online {
+    color: #86efac;
+
+    background:
+        rgba(34, 197, 94, 0.08);
+
+    border:
+        1px solid rgba(34, 197, 94, 0.18);
+}
+
+
+/* OFFLINE */
+
+.connection-status.offline {
+    color: #fbbf24;
+
+    background:
+        rgba(245, 158, 11, 0.08);
+
+    border:
+        1px solid rgba(245, 158, 11, 0.18);
+}
+
+
+/* =========================
+   CONNECTION DOT
+========================= */
 
 .connection-dot {
     width: 8px;
@@ -145,6 +173,17 @@ header p {
 
     border-radius: 50%;
 
+    flex-shrink: 0;
+
+    transition:
+        background 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+/* ONLINE DOT */
+
+.connection-status.online .connection-dot {
     background: #22c55e;
 
     box-shadow:
@@ -154,6 +193,23 @@ header p {
     animation: pulse 2s infinite;
 }
 
+
+/* OFFLINE DOT */
+
+.connection-status.offline .connection-dot {
+    background: #f59e0b;
+
+    box-shadow:
+        0 0 0 4px rgba(245, 158, 11, 0.10),
+        0 0 12px rgba(245, 158, 11, 0.55);
+
+    animation: none;
+}
+
+
+/* =========================
+   PULSE ANIMATION
+========================= */
 
 @keyframes pulse {
 
@@ -323,7 +379,7 @@ button:active {
 
 
 /* =========================
-   FEEDING
+   FEEDING STATUS
 ========================= */
 
 #feedStatus {
@@ -460,10 +516,10 @@ button:active {
 
 
 /* =========================
-   STATUS COLORS
+   STATUS - ONLINE
 ========================= */
 
-.online {
+.status.online {
     color: #86efac;
 
     background:
@@ -474,7 +530,11 @@ button:active {
 }
 
 
-.offline {
+/* =========================
+   STATUS - OFFLINE
+========================= */
+
+.status.offline {
     color: #fbbf24;
 
     background:
@@ -525,15 +585,18 @@ body::before {
         padding: 28px 20px;
     }
 
+
     .header-content {
         flex-direction: column;
 
         align-items: flex-start;
     }
 
+
     header h1 {
         font-size: 34px;
     }
+
 
     main {
         grid-template-columns: 1fr;
@@ -553,17 +616,21 @@ body::before {
         flex-direction: column;
     }
 
+
     .connection-status {
         align-self: flex-start;
     }
+
 
     .card {
         padding: 21px;
     }
 
+
     #temperature {
         font-size: 38px;
     }
+
 
     #nextFeeding {
         font-size: 32px;

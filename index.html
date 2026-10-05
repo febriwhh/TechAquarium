@@ -17,6 +17,7 @@
     ========================== -->
 
     <header>
+
         <div class="header-content">
 
             <div>
@@ -24,12 +25,19 @@
                 <p>Smart Aquarium System</p>
             </div>
 
-            <div class="connection-status">
-                <span class="connection-dot"></span>
-                <span>System Online</span>
+            <!-- Connection Status -->
+            <div id="connectionStatus" class="connection-status offline">
+
+                <span id="connectionDot" class="connection-dot"></span>
+
+                <span id="connectionText">
+                    System Offline
+                </span>
+
             </div>
 
         </div>
+
     </header>
 
 
@@ -38,6 +46,7 @@
     ========================== -->
 
     <main>
+
 
         <!-- =========================
              TEMPERATURE
@@ -122,6 +131,9 @@
 
             <h2>⚙️ System Status</h2>
 
+
+            <!-- ESP32 -->
+
             <div class="status-row">
 
                 <span>
@@ -135,6 +147,8 @@
             </div>
 
 
+            <!-- Temperature Sensor -->
+
             <div class="status-row">
 
                 <span>
@@ -147,6 +161,8 @@
 
             </div>
 
+
+            <!-- Feeder -->
 
             <div class="status-row">
 
@@ -177,6 +193,83 @@
     ========================== -->
 
     <script src="script.js"></script>
+
+
+    <!-- =========================
+         HEADER CONNECTION STATUS
+         SYNC
+    ========================== -->
+
+    <script>
+
+        const espStatus =
+            document.getElementById("espStatus");
+
+        const connectionStatus =
+            document.getElementById("connectionStatus");
+
+        const connectionText =
+            document.getElementById("connectionText");
+
+
+        function updateConnectionStatus() {
+
+            if (
+                espStatus.classList.contains("online")
+            ) {
+
+                connectionStatus.classList.remove(
+                    "offline"
+                );
+
+                connectionStatus.classList.add(
+                    "online"
+                );
+
+                connectionText.textContent =
+                    "System Online";
+
+            } else {
+
+                connectionStatus.classList.remove(
+                    "online"
+                );
+
+                connectionStatus.classList.add(
+                    "offline"
+                );
+
+                connectionText.textContent =
+                    "System Offline";
+            }
+        }
+
+
+        // Initial state
+
+        updateConnectionStatus();
+
+
+        // Watch changes made by script.js
+
+        const statusObserver =
+            new MutationObserver(() => {
+
+                updateConnectionStatus();
+
+            });
+
+
+        statusObserver.observe(
+            espStatus,
+            {
+                attributes: true,
+                childList: true,
+                subtree: true
+            }
+        );
+
+    </script>
 
 </body>
 
