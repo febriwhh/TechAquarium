@@ -12,7 +12,6 @@ const schedulebutton = document.getElementById("scheduleButton");
 const scheduleStatus = document.getElementById("scheduleStatus");
 const nextFeedingTime = document.getElementById("nextFeeding");
 
-
 const feedTopic = "techaquarium/feeder/cmd";
 const temperatureTopic = "techaquarium/sensor/temperature";
 const heartbeatTopic = "techaquarium/status/heartbeat";
@@ -42,10 +41,10 @@ function setStatus(element, text, online) {
     }
 }
 
-client.on("connect", function() {
+client.on("connect", function () {
     console.log("✅ Connected to HiveMQ");
 
-    client.subscribe(temperatureTopic, function(error) {
+    client.subscribe(temperatureTopic, function (error) {
         if (error) {
             console.error("❌ Temperature subscribe error:", error);
         } else {
@@ -53,7 +52,7 @@ client.on("connect", function() {
         }
     });
 
-    client.subscribe(heartbeatTopic, function(error) {
+    client.subscribe(heartbeatTopic, function (error) {
         if (error) {
             console.error("❌ Heartbeat subscribe error:", error);
         } else {
@@ -62,7 +61,7 @@ client.on("connect", function() {
     });
 });
 
-client.on("message", function(topic, message) {
+client.on("message", function (topic, message) {
 
     const data = message.toString();
 
@@ -100,19 +99,19 @@ client.on("message", function(topic, message) {
     }
 });
 
-client.on("error", function(error) {
+client.on("error", function (error) {
     console.error("❌ MQTT Error:", error);
 });
 
-client.on("reconnect", function() {
+client.on("reconnect", function () {
     console.log("🔄 Reconnecting to HiveMQ...");
 });
 
-client.on("offline", function() {
+client.on("offline", function () {
     console.log("⚠️ MQTT Offline");
 });
 
-setInterval(function() {
+setInterval(function () {
 
     const now = Date.now();
 
@@ -128,7 +127,7 @@ setInterval(function() {
 
 }, 1000);
 
-feedButton.addEventListener("click", function() {
+feedButton.addEventListener("click", function () {
 
     if (!client.connected) {
         feedStatus.textContent = "⚠️ Feeder connection unavailable";
@@ -142,7 +141,7 @@ feedButton.addEventListener("click", function() {
 
     feedStatus.textContent = "🐟 Feeding command sent";
 
-    setTimeout(function() {
+    setTimeout(function () {
 
         feedButton.textContent = "FEED NOW";
         feedButton.disabled = false;
@@ -153,7 +152,7 @@ feedButton.addEventListener("click", function() {
 
 });
 
-schedulebutton.addEventListener("click", function() {
+schedulebutton.addEventListener("click", function () {
 
     const time = feedingTime.value;
 
@@ -177,4 +176,3 @@ schedulebutton.addEventListener("click", function() {
 
 
 });
-

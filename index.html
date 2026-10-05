@@ -1,105 +1,102 @@
 <!DOCTYPE html>
 
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechAquarium</title>
 
-```
-<title>TechAquarium</title>
-
-<link rel="stylesheet" href="style.css">
-```
+    <link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
-```
-<header>
-    <h1>🐟 TechAquarium</h1>
-    <p>Smart Aquarium System</p>
-</header>
+    <header>
+        <h1>🐟 TechAquarium</h1>
+        <p>Smart Aquarium System</p>
+    </header>
 
-<main>
+    <main>
 
-    <!-- Temperature -->
-    <section class="card">
-        <h2>🌡️ Temperature</h2>
+        <!-- Temperature -->
+        <section class="card">
+            <h2>🌡️ Temperature</h2>
 
-        <div class="temperature-box">
-            <p id="temperature">-- °C</p>
-            <p id="temperature-status">Waiting for sensor...</p>
-        </div>
-    </section>
-
-
-    <!-- Feeding -->
-    <section class="card">
-        <h2>🍽️ Feeding Control</h2>
-
-        <button id="feedButton">
-            FEED NOW
-        </button>
-
-        <p id="feedStatus">
-            Feeder ready
-        </p>
-    </section>
+            <div class="temperature-box">
+                <p id="temperature">-- °C</p>
+                <p id="temperature-status">Waiting for sensor...</p>
+            </div>
+        </section>
 
 
-    <!-- Schedule -->
-    <section class="card">
-        <h2>⏰ Feeding Schedule</h2>
+        <!-- Feeding -->
+        <section class="card">
+            <h2>🍽️ Feeding Control</h2>
 
-        <p class="label">Next Feeding</p>
-
-        <p id="nextFeeding">--:--</p>
-
-        <div class="schedule-control">
-            <input type="time" id="feedingTime">
-
-            <button id="scheduleButton">
-                SET SCHEDULE
+            <button id="feedButton">
+                FEED NOW
             </button>
-        </div>
 
-        <p id="scheduleStatus">
-            No schedule set
-        </p>
-    </section>
+            <p id="feedStatus">
+                Feeder ready
+            </p>
+        </section>
 
 
-    <!-- System Status -->
-    <section class="card">
-        <h2>⚙️ System Status</h2>
+        <!-- Schedule -->
+        <section class="card">
+            <h2>⏰ Feeding Schedule</h2>
 
-        <div class="status-row">
-            <span>ESP32</span>
-            <span id="espStatus" class="status offline">
-                Offline
-            </span>
-        </div>
+            <p class="label">Next Feeding</p>
 
-        <div class="status-row">
-            <span>Temperature Sensor</span>
-            <span id="sensorStatus" class="status offline">
-                Waiting
-            </span>
-        </div>
+            <p id="nextFeeding">--:--</p>
 
-        <div class="status-row">
-            <span>Feeder</span>
-            <span id="feederStatus" class="status online">
-                Ready
-            </span>
-        </div>
-    </section>
+            <div class="schedule-control">
+                <input type="time" id="feedingTime">
 
-</main>
-<script src="https://cdn.jsdelivr.net/npm/mqtt/dist/mqtt.min.js"></script>
-<script src="script.js"></script>
-```
+                <button id="scheduleButton">
+                    SET SCHEDULE
+                </button>
+            </div>22
+
+            <p id="scheduleStatus">
+                No schedule set
+            </p>
+        </section>
+
+
+        <!-- System Status -->
+        <section class="card">
+            <h2>⚙️ System Status</h2>
+
+            <div class="status-row">
+                <span>ESP32</span>
+                <span id="espStatus" class="status offline">
+                    Offline
+                </span>
+            </div>
+
+            <div class="status-row">
+                <span>Temperature Sensor</span>
+                <span id="sensorStatus" class="status offline">
+                    Waiting
+                </span>
+            </div>
+
+            <div class="status-row">
+                <span>Feeder</span>
+                <span id="feederStatus" class="status online">
+                    Ready
+                </span>
+            </div>
+        </section>
+
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/mqtt/dist/mqtt.min.js"></script>
+    <script src="script.js"></script>
 
 </body>
+
 </html>
