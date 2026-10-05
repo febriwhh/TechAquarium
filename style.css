@@ -4,40 +4,70 @@
     box-sizing: border-box;
 }
 
+
+/* =========================
+   BODY
+========================= */
+
 body {
     font-family: "Segoe UI", Arial, sans-serif;
 
     background:
-        radial-gradient(
-            circle at 20% 20%,
-            rgba(37, 99, 235, 0.18),
-            transparent 25%
-        ),
-        radial-gradient(
-            circle at 80% 70%,
-            rgba(14, 165, 233, 0.12),
-            transparent 25%
-        ),
-        linear-gradient(
-            135deg,
+        radial-gradient(circle at 15% 20%,
+            rgba(37, 99, 235, 0.16),
+            transparent 28%),
+        radial-gradient(circle at 85% 75%,
+            rgba(14, 165, 233, 0.10),
+            transparent 28%),
+        linear-gradient(135deg,
             #020617,
-            #0f172a 50%,
-            #020617
-        );
+            #0b1326 50%,
+            #020617);
 
-    color: white;
+    color: #f8fafc;
+
     min-height: 100vh;
-    position: relative;
+
     overflow-x: hidden;
+
+    position: relative;
 }
+
+
+/* =========================
+   HEADER
+========================= */
 
 header {
-    padding: 50px 20px;
-    text-align: center;
-    background: rgba(15, 23, 42, 0.75);
-    border-bottom: 1px solid rgba(96, 165, 250, 0.2);
-    backdrop-filter: blur(10px);
+    padding: 35px 40px;
+
+    background:
+        rgba(7, 18, 37, 0.82);
+
+    border-bottom:
+        1px solid rgba(96, 165, 250, 0.16);
+
+    backdrop-filter: blur(14px);
 }
+
+.header-content {
+    max-width: 1000px;
+
+    margin: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+/* =========================
+   LOGO / TITLE
+========================= */
 
 header h1 {
     font-family:
@@ -45,218 +75,497 @@ header h1 {
         "Segoe UI",
         sans-serif;
 
-    font-size: 48px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
+    font-size: 44px;
 
-    background: linear-gradient(
-        90deg,
-        #60a5fa,
-        #38bdf8,
-        #67e8f9
-    );
+    font-weight: 800;
+
+    letter-spacing: 0.5px;
+
+    margin-bottom: 5px;
+
+    background:
+        linear-gradient(90deg,
+            #60a5fa,
+            #38bdf8,
+            #67e8f9);
 
     -webkit-background-clip: text;
+
     -webkit-text-fill-color: transparent;
 
     text-shadow:
-        0 0 25px rgba(56, 189, 248, 0.25);
+        0 0 25px rgba(56, 189, 248, 0.22);
 }
 
+
 header p {
-    width: 100%;
-    text-align:center;
     color: #94a3b8;
-    font-size: 18px;
-    letter-spacing: 1px;
+
+    font-size: 16px;
+
+    letter-spacing: 0.8px;
 }
+
+
+/* =========================
+   CONNECTION STATUS
+========================= */
+
+.connection-status {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 9px 14px;
+
+    border-radius: 999px;
+
+    background:
+        rgba(34, 197, 94, 0.08);
+
+    border:
+        1px solid rgba(34, 197, 94, 0.18);
+
+    color: #86efac;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+.connection-dot {
+    width: 8px;
+
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+
+    box-shadow:
+        0 0 0 4px rgba(34, 197, 94, 0.10),
+        0 0 12px rgba(34, 197, 94, 0.65);
+
+    animation: pulse 2s infinite;
+}
+
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.45;
+    }
+}
+
+
+/* =========================
+   MAIN DASHBOARD
+========================= */
 
 main {
     max-width: 1000px;
-    margin: 40px auto;
-    padding: 20px;
+
+    margin: 45px auto;
+
+    padding: 0 20px;
 
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
     gap: 20px;
 }
 
+
+/* =========================
+   CARD
+========================= */
+
 .card {
-    background: rgba(30, 41, 59, 0.78);
+    position: relative;
+
+    background:
+        rgba(22, 34, 53, 0.82);
+
     padding: 25px;
+
     border-radius: 18px;
 
-    border: 1px solid rgba(148, 163, 184, 0.15);
+    border:
+        1px solid rgba(148, 163, 184, 0.13);
 
     box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.25);
+        0 12px 35px rgba(0, 0, 0, 0.24);
 
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
 
     transition:
-        transform 0.3s ease-out,
-        border-color 0.3s ease-out,
-        box-shadow 0.3s ease-out;
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
 }
+
 
 .card:hover {
-    transform: translateY(-6px);
+    transform: translateY(-3px);
 
-    border-color: rgba(96, 165, 250, 0.4);
+    border-color:
+        rgba(96, 165, 250, 0.28);
 
     box-shadow:
-        0 15px 35px rgba(0, 0, 0, 0.35);
+        0 16px 40px rgba(0, 0, 0, 0.30);
 }
+
 
 .card h2 {
     margin-bottom: 20px;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    color: #f8fafc;
 }
 
-#temperature {
-    font-size: 42px;
-    font-weight: bold;
-    margin-bottom: 10px;
+
+/* =========================
+   TEMPERATURE
+========================= */
+
+.temperature-box {
+    padding-top: 5px;
 }
+
+
+#temperature {
+    font-size: 44px;
+
+    font-weight: 750;
+
+    letter-spacing: -1px;
+
+    margin-bottom: 8px;
+
+    color: #f8fafc;
+}
+
 
 #temperature-status {
     color: #94a3b8;
+
+    font-size: 14px;
 }
+
+
+/* =========================
+   BUTTON
+========================= */
 
 button {
     width: 100%;
-    padding: 15px;
+
+    padding: 14px 16px;
 
     border: none;
+
     border-radius: 10px;
 
-    background: #2563eb;
+    background:
+        linear-gradient(135deg,
+            #2563eb,
+            #3b82f6);
+
     color: white;
 
-    font-size: 16px;
-    font-weight: bold;
+    font-size: 15px;
+
+    font-weight: 700;
 
     cursor: pointer;
 
+    box-shadow:
+        0 6px 18px rgba(37, 99, 235, 0.20);
+
     transition:
         background 0.2s ease,
-        transform 0.2s ease;
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
+
 button:hover {
-    background: #1d4ed8;
-    transform: scale(1.02);
+    background:
+        linear-gradient(135deg,
+            #3b82f6,
+            #60a5fa);
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 8px 22px rgba(37, 99, 235, 0.30);
 }
+
 
 button:active {
     transform: scale(0.98);
 }
 
+
+/* =========================
+   FEEDING
+========================= */
+
 #feedStatus {
     color: #94a3b8;
+
     margin-top: 12px;
+
     text-align: center;
+
+    font-size: 14px;
 }
+
+
+/* =========================
+   SCHEDULE
+========================= */
 
 .label {
     color: #94a3b8;
+
     margin-bottom: 5px;
+
+    font-size: 14px;
 }
+
 
 #nextFeeding {
     font-size: 36px;
-    font-weight: bold;
+
+    font-weight: 750;
+
+    letter-spacing: -0.5px;
+
+    margin-bottom: 5px;
 }
+
+
+.schedule-control {
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 18px;
+}
+
+
+#feedingTime {
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 13px 14px;
+
+    border:
+        1px solid #334155;
+
+    border-radius: 10px;
+
+    background:
+        #0b1326;
+
+    color: white;
+
+    font-size: 16px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+#feedingTime:focus {
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+
+#scheduleButton {
+    flex: 1;
+}
+
+
+#scheduleStatus {
+    margin-top: 12px;
+
+    color: #94a3b8;
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   SYSTEM STATUS
+========================= */
 
 .status-row {
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
 
-    padding: 12px 0;
+    gap: 15px;
+
+    padding: 13px 0;
 
     border-bottom:
-        1px solid #334155;
+        1px solid rgba(148, 163, 184, 0.12);
 }
+
 
 .status-row:last-child {
     border-bottom: none;
 }
 
+
 .status {
-    font-size: 14px;
-    font-weight: bold;
+    padding: 5px 10px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.2px;
 }
+
+
+/* =========================
+   STATUS COLORS
+========================= */
 
 .online {
-    color: #22c55e;
+    color: #86efac;
+
+    background:
+        rgba(34, 197, 94, 0.10);
+
+    border:
+        1px solid rgba(34, 197, 94, 0.18);
 }
 
+
 .offline {
-    color: #f59e0b;
+    color: #fbbf24;
+
+    background:
+        rgba(245, 158, 11, 0.10);
+
+    border:
+        1px solid rgba(245, 158, 11, 0.18);
 }
+
+
+/* =========================
+   BACKGROUND GLOW
+========================= */
 
 body::before {
     content: "";
 
     position: fixed;
 
-    width: 300px;
-    height: 300px;
+    width: 320px;
+
+    height: 320px;
 
     top: 10%;
-    left: -100px;
+
+    left: -120px;
 
     background:
-        rgba(14, 165, 233, 0.08);
+        rgba(14, 165, 233, 0.07);
 
     border-radius: 50%;
 
-    filter: blur(80px);
+    filter: blur(90px);
 
     pointer-events: none;
+
+    z-index: -1;
 }
+
+
+/* =========================
+   TABLET
+========================= */
 
 @media (max-width: 700px) {
 
+    header {
+        padding: 28px 20px;
+    }
+
+    .header-content {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
     header h1 {
-        font-size: 32px;
+        font-size: 34px;
     }
 
     main {
         grid-template-columns: 1fr;
-        margin-top: 20px;
+
+        margin-top: 30px;
     }
 }
 
-.schedule-control {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
 
-#feedingTime {
-    flex: 1;
-    padding: 14px;
-    border: 1px solid #475569;
-    border-radius: 10px;
-    background: #0f172a;
-    color: white;
-    font-size: 16px;
-}
-
-#scheduleButton {
-    flex: 1;
-}
-
-#scheduleStatus {
-    margin-top: 12px;
-    color: #94a3b8;
-    text-align: center;
-}
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 500px) {
+
     .schedule-control {
         flex-direction: column;
+    }
+
+    .connection-status {
+        align-self: flex-start;
+    }
+
+    .card {
+        padding: 21px;
+    }
+
+    #temperature {
+        font-size: 38px;
+    }
+
+    #nextFeeding {
+        font-size: 32px;
     }
 }

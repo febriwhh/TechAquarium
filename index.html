@@ -1,38 +1,73 @@
 <!DOCTYPE html>
-
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>TechAquarium</title>
 
     <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
 
+    <!-- =========================
+         HEADER
+    ========================== -->
+
     <header>
-        <h1>🐟 TechAquarium</h1>
-        <p>Smart Aquarium System</p>
+        <div class="header-content">
+
+            <div>
+                <h1>🐟 TechAquarium</h1>
+                <p>Smart Aquarium System</p>
+            </div>
+
+            <div class="connection-status">
+                <span class="connection-dot"></span>
+                <span>System Online</span>
+            </div>
+
+        </div>
     </header>
+
+
+    <!-- =========================
+         MAIN DASHBOARD
+    ========================== -->
 
     <main>
 
-        <!-- Temperature -->
+        <!-- =========================
+             TEMPERATURE
+        ========================== -->
+
         <section class="card">
+
             <h2>🌡️ Temperature</h2>
 
             <div class="temperature-box">
-                <p id="temperature">-- °C</p>
-                <p id="temperature-status">Waiting for sensor...</p>
+
+                <p id="temperature">
+                    -- °C
+                </p>
+
+                <p id="temperature-status">
+                    Waiting for sensor...
+                </p>
+
             </div>
+
         </section>
 
 
-        <!-- Feeding -->
+        <!-- =========================
+             FEEDING CONTROL
+        ========================== -->
+
         <section class="card">
+
             <h2>🍽️ Feeding Control</h2>
 
             <button id="feedButton">
@@ -42,59 +77,105 @@
             <p id="feedStatus">
                 Feeder ready
             </p>
+
         </section>
 
 
-        <!-- Schedule -->
+        <!-- =========================
+             FEEDING SCHEDULE
+        ========================== -->
+
         <section class="card">
+
             <h2>⏰ Feeding Schedule</h2>
 
-            <p class="label">Next Feeding</p>
+            <p class="label">
+                Next Feeding
+            </p>
 
-            <p id="nextFeeding">--:--</p>
+            <p id="nextFeeding">
+                --:--
+            </p>
 
             <div class="schedule-control">
+
                 <input type="time" id="feedingTime">
 
                 <button id="scheduleButton">
                     SET SCHEDULE
                 </button>
-            </div>22
+
+            </div>
 
             <p id="scheduleStatus">
                 No schedule set
             </p>
+
         </section>
 
 
-        <!-- System Status -->
+        <!-- =========================
+             SYSTEM STATUS
+        ========================== -->
+
         <section class="card">
+
             <h2>⚙️ System Status</h2>
 
             <div class="status-row">
-                <span>ESP32</span>
+
+                <span>
+                    ESP32
+                </span>
+
                 <span id="espStatus" class="status offline">
                     Offline
                 </span>
+
             </div>
 
+
             <div class="status-row">
-                <span>Temperature Sensor</span>
+
+                <span>
+                    Temperature Sensor
+                </span>
+
                 <span id="sensorStatus" class="status offline">
                     Waiting
                 </span>
+
             </div>
 
+
             <div class="status-row">
-                <span>Feeder</span>
+
+                <span>
+                    Feeder
+                </span>
+
                 <span id="feederStatus" class="status online">
                     Ready
                 </span>
+
             </div>
+
         </section>
 
     </main>
+
+
+    <!-- =========================
+         MQTT LIBRARY
+    ========================== -->
+
     <script src="https://cdn.jsdelivr.net/npm/mqtt/dist/mqtt.min.js"></script>
+
+
+    <!-- =========================
+         TECHAQUARIUM SCRIPT
+    ========================== -->
+
     <script src="script.js"></script>
 
 </body>
