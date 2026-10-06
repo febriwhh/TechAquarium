@@ -167,6 +167,8 @@ header p {
 ========================= */
 
 .connection-dot {
+    position: relative;
+
     width: 8px;
 
     height: 8px;
@@ -181,6 +183,19 @@ header p {
 }
 
 
+.connection-dot::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+}
+
+
 /* ONLINE DOT */
 
 .connection-status.online .connection-dot {
@@ -190,7 +205,14 @@ header p {
         0 0 0 4px rgba(34, 197, 94, 0.10),
         0 0 12px rgba(34, 197, 94, 0.65);
 
-    animation: pulse 2s infinite;
+    animation: live-glow 2.4s ease-in-out infinite;
+}
+
+
+.connection-status.online .connection-dot::after {
+    background: rgba(34, 197, 94, 0.45);
+
+    animation: live-ping 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
 }
 
 
@@ -207,19 +229,59 @@ header p {
 }
 
 
+.connection-status.offline .connection-dot::after {
+    animation: none;
+}
+
+
 /* =========================
-   PULSE ANIMATION
+   LIVE STATUS ANIMATION
 ========================= */
 
-@keyframes pulse {
+@keyframes live-glow {
 
     0%,
     100% {
-        opacity: 1;
+        box-shadow:
+            0 0 0 4px rgba(34, 197, 94, 0.10),
+            0 0 12px rgba(34, 197, 94, 0.65);
     }
 
     50% {
-        opacity: 0.45;
+        box-shadow:
+            0 0 0 5px rgba(34, 197, 94, 0.16),
+            0 0 18px rgba(34, 197, 94, 0.85);
+    }
+}
+
+
+@keyframes live-ping {
+
+    0% {
+        transform: scale(1);
+
+        opacity: 0.7;
+    }
+
+    70% {
+        transform: scale(3.4);
+
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(3.4);
+
+        opacity: 0;
+    }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+    .connection-status.online .connection-dot,
+    .connection-status.online .connection-dot::after {
+        animation: none;
     }
 }
 
