@@ -1,3 +1,17 @@
+// =====================================================
+// TECHAQUARIUM - DASHBOARD JAVASCRIPT
+// Login, MQTT, Temperature, Feeder, Schedule
+// =====================================================
+
+// 1. HTML ELEMENTS
+
+const loginScreen = document.getElementById("loginScreen");
+const loginForm = document.getElementById("loginForm");
+const loginUsername = document.getElementById("loginUsername");
+const loginButton = document.getElementById("loginButton");
+const loginStatus = document.getElementById("loginStatus");
+const appScreen = document.getElementById("appScreen");
+
 const feedButton = document.getElementById("feedButton");
 const feedStatus = document.getElementById("feedStatus");
 
@@ -16,6 +30,8 @@ const nextFeedingTime = document.getElementById("nextFeeding");
 const connectionStatus = document.getElementById("connectionStatus");
 const connectionText = document.getElementById("connectionText");
 
+// 2. MQTT CONFIGURATION
+
 const feedTopic = "techaquarium/feeder/cmd";
 const temperatureTopic = "techaquarium/sensor/temperature";
 const heartbeatTopic = "techaquarium/status/heartbeat";
@@ -24,371 +40,457 @@ const scheduleTopic = "techaquarium/feederschedule";
 const broker =
     "wss://df8a0c1a72354a6fb5ad02c3902b1df8.s1.eu.hivemq.cloud:8884/mqtt";
 
+// Set up a dedicated MQTT account with limited permissions.
+// Do not use administrator credentials in a public website.
+
 const options = {
     username: "TechAquarium-Web",
     password: "sandihpelitebook",
-    clientId: "TechAquarium-Web-" + Math.random().toString(16).substr(2, 8)
+    clientId: "TechAquarium-Web-" + Math.random().toString(16).slice(2, 10),
+    clean: true,
+    connectTimeout: 10000,
+    reconnectPeriod: 3000
 };
 
-const client = mqtt.connect(broker, options);
+// 3. SYSTEM VARIABLES
 
+let client = null;
 let lastHeartbeat = 0;
 let lastTemperature = 0;
+let mqttConnected = false;
+let espOnline = false;
+let feedingInProgress = false;
 
-
-// ========================================
-// STATUS HELPER
-// ========================================
+// 4. STATUS HELPER
 
 function setStatus(element, text, online) {
-    element.textContent = text;
+    if (!element) return;
 
-    if (online) {
-        element.classList.remove("offline");
-        element.classList.add("online");
-    } else {
-        element.classList.remove("online");
-        element.classList.add("offline");
-    }
+
+    element.textContent = text;
+    element.classList.toggle("online", Boolean(online));
+    element.classList.toggle("offline", !online);
+
+
 }
 
-
-// ========================================
-// HEADER CONNECTION STATUS
-// ========================================
+// 5. CONNECTION STATUS
 
 function updateConnectionStatus() {
-    if (!connectionStatus || !connectionText) {
+    const systemOnline = mqttConnected && espOnline;
+
+
+    setStatus(
+        connectionStatus,
+        systemOnline ? "System Online" : "System Offline",
+        systemOnline
+    );
+
+    if (connectionText) {
+        if (systemOnline) {
+            connectionText.textContent = "System Online";
+        } else if (mqttConnected) {
+            connectionText.textContent = "ESP32 Offline";
+        } else {
+            connectionText.textContent = "MQTT Disconnected";
+        }
+    }
+
+
+}
+
+// 6. INITIAL STATUS
+
+function initializeStatus() {
+    setStatus(espStatus, "Offline", false);
+    setStatus(sensorStatus, "Waiting", false);
+    setStatus(feederStatus, "Offline", false);
+
+
+    updateConnectionStatus();
+
+    if (temperatureStatus) {
+        temperatureStatus.textContent = "Waiting for sensor...";
+    }
+
+    if (feedStatus) {
+        feedStatus.textContent = "Feeder ready";
+    }
+
+    if (scheduleStatus) {
+        scheduleStatus.textContent = "No schedule sent";
+    }
+
+
+}
+
+initializeStatus();
+
+// 7. LOGIN
+
+if (loginForm) {
+    loginForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+
+        const username = loginUsername
+            ? loginUsername.value.trim()
+            : "";
+
+        if (!username) {
+            if (loginStatus) {
+                loginStatus.textContent = "Please enter your name.";
+            }
+
+            if (loginUsername) {
+                loginUsername.focus();
+            }
+
+            return;
+        }
+
+        if (loginStatus) {
+            loginStatus.textContent = "Welcome, " + username + "!";
+        }
+
+        if (loginButton) {
+            loginButton.disabled = true;
+            loginButton.textContent = "Opening dashboard...";
+        }
+
+        setTimeout(function () {
+            if (loginScreen) {
+                loginScreen.hidden = true;
+            }
+
+            if (appScreen) {
+                appScreen.hidden = false;
+            }
+
+            document.body.classList.add("dashboard-active");
+
+            if (loginButton) {
+                loginButton.disabled = false;
+                loginButton.textContent = "Enter Dashboard";
+            }
+        }, 500);
+    });
+
+
+}
+
+// 8. MQTT CONNECTION
+
+function connectMQTT() {
+    if (typeof mqtt === "undefined") {
+        console.error("MQTT library is missing.");
+
+
+        if (loginStatus) {
+            loginStatus.textContent =
+                "MQTT library not loaded. Check your HTML.";
+        }
+
         return;
     }
 
-    const isOnline = espStatus.classList.contains("online");
-
-    if (isOnline) {
-        connectionStatus.classList.remove("offline");
-        connectionStatus.classList.add("online");
-
-        connectionText.textContent = "System Online";
-    } else {
-        connectionStatus.classList.remove("online");
-        connectionStatus.classList.add("offline");
-
-        connectionText.textContent = "System Offline";
+    if (
+        options.username === "YOUR_MQTT_USERNAME" ||
+        options.password === "YOUR_NEW_MQTT_PASSWORD" ||
+        !options.username ||
+        !options.password
+    ) {
+        console.warn("MQTT credentials need configuration.");
+        return;
     }
+
+    client = mqtt.connect(broker, options);
+
+    client.on("connect", function () {
+        console.log("Connected to HiveMQ.");
+
+        mqttConnected = true;
+        updateConnectionStatus();
+
+        client.subscribe(
+            [temperatureTopic, heartbeatTopic],
+            function (error) {
+                if (error) {
+                    console.error("MQTT subscription error:", error);
+                } else {
+                    console.log("Subscribed to dashboard topics.");
+                }
+            }
+        );
+    });
+
+    client.on("message", function (topic, message) {
+        const data = message.toString().trim();
+
+        // TEMPERATURE
+
+        if (topic === temperatureTopic) {
+            const temperature = Number(data);
+
+            if (data !== "" && Number.isFinite(temperature)) {
+                lastTemperature = Date.now();
+
+                if (temperatureDisplay) {
+                    temperatureDisplay.textContent =
+                        temperature.toFixed(1) + " °C";
+                }
+
+                if (temperatureStatus) {
+                    temperatureStatus.textContent = "Live sensor data";
+                }
+
+                setStatus(sensorStatus, "Online", true);
+            }
+        }
+
+        // ESP32 HEARTBEAT
+
+        if (topic === heartbeatTopic) {
+            lastHeartbeat = Date.now();
+
+            if (data.toUpperCase() === "ONLINE") {
+                espOnline = true;
+
+                setStatus(espStatus, "Online", true);
+                setStatus(feederStatus, "Ready", true);
+
+                console.log("ESP32 Online.");
+            } else if (data.toUpperCase() === "OFFLINE") {
+                espOnline = false;
+
+                setStatus(espStatus, "Offline", false);
+                setStatus(feederStatus, "Offline", false);
+
+                console.log("ESP32 Offline.");
+            }
+
+            updateConnectionStatus();
+        }
+    });
+
+    client.on("error", function (error) {
+        console.error("MQTT error:", error);
+    });
+
+    client.on("reconnect", function () {
+        console.log("Reconnecting to HiveMQ...");
+    });
+
+    client.on("offline", function () {
+        mqttConnected = false;
+        updateConnectionStatus();
+
+        console.warn("MQTT connection offline.");
+    });
+
+    client.on("close", function () {
+        mqttConnected = false;
+        updateConnectionStatus();
+    });
+
+    client.on("end", function () {
+        mqttConnected = false;
+        updateConnectionStatus();
+    });
+
+
 }
 
+connectMQTT();
 
-// ========================================
-// MQTT CONNECTION
-// ========================================
-
-client.on("connect", function () {
-    console.log("✅ Connected to HiveMQ");
-
-    client.subscribe(temperatureTopic, function (error) {
-        if (error) {
-            console.error("❌ Temperature subscribe error:", error);
-        } else {
-            console.log("🌡️ Subscribed to temperature");
-        }
-    });
-
-    client.subscribe(heartbeatTopic, function (error) {
-        if (error) {
-            console.error("❌ Heartbeat subscribe error:", error);
-        } else {
-            console.log("💓 Subscribed to heartbeat");
-        }
-    });
-});
-
-
-// ========================================
-// MQTT MESSAGE
-// ========================================
-
-client.on("message", function (topic, message) {
-
-    const data = message.toString().trim();
-
-    // ------------------------------------
-    // TEMPERATURE
-    // ------------------------------------
-
-    if (topic === temperatureTopic) {
-
-        const temperature = parseFloat(data);
-
-        if (!isNaN(temperature)) {
-
-            temperatureDisplay.textContent =
-                temperature.toFixed(1) + " °C";
-
-            temperatureStatus.textContent =
-                "Live sensor data";
-
-            lastTemperature = Date.now();
-
-            setStatus(
-                sensorStatus,
-                "Online",
-                true
-            );
-        }
-    }
-
-
-    // ------------------------------------
-    // HEARTBEAT
-    // ------------------------------------
-
-    if (topic === heartbeatTopic) {
-
-        lastHeartbeat = Date.now();
-
-        if (data === "ONLINE") {
-
-            setStatus(
-                espStatus,
-                "Online",
-                true
-            );
-
-            setStatus(
-                feederStatus,
-                "Ready",
-                true
-            );
-
-            console.log("🟢 ESP32 Online");
-
-            updateConnectionStatus();
-        }
-
-
-        if (data === "OFFLINE") {
-
-            setStatus(
-                espStatus,
-                "Offline",
-                false
-            );
-
-            setStatus(
-                feederStatus,
-                "Offline",
-                false
-            );
-
-            console.log("🔴 ESP32 Offline");
-
-            updateConnectionStatus();
-        }
-    }
-});
-
-
-// ========================================
-// MQTT ERROR
-// ========================================
-
-client.on("error", function (error) {
-    console.error("❌ MQTT Error:", error);
-});
-
-
-// ========================================
-// MQTT RECONNECT
-// ========================================
-
-client.on("reconnect", function () {
-    console.log("🔄 Reconnecting to HiveMQ...");
-});
-
-
-// ========================================
-// MQTT OFFLINE
-// ========================================
-
-client.on("offline", function () {
-    console.log("⚠️ MQTT Offline");
-});
-
-
-// ========================================
-// HEARTBEAT & SENSOR TIMEOUT CHECK
-// ========================================
+// 9. DEVICE AND SENSOR TIMEOUT
 
 setInterval(function () {
-
     const now = Date.now();
 
 
-    // ------------------------------------
-    // ESP32 HEARTBEAT TIMEOUT
-    // ------------------------------------
+    if (
+        lastHeartbeat === 0 ||
+        now - lastHeartbeat > 10000
+    ) {
+        espOnline = false;
 
-    if (now - lastHeartbeat > 10000) {
-
-        setStatus(
-            espStatus,
-            "Offline",
-            false
-        );
-
-        setStatus(
-            feederStatus,
-            "Offline",
-            false
-        );
-
-        updateConnectionStatus();
+        setStatus(espStatus, "Offline", false);
+        setStatus(feederStatus, "Offline", false);
     }
 
+    if (
+        lastTemperature === 0 ||
+        now - lastTemperature > 5000
+    ) {
+        setStatus(sensorStatus, "Waiting", false);
 
-    // ------------------------------------
-    // TEMPERATURE SENSOR TIMEOUT
-    // ------------------------------------
-
-    if (now - lastTemperature > 5000) {
-
-        setStatus(
-            sensorStatus,
-            "Waiting",
-            false
-        );
-
-        temperatureStatus.textContent =
-            "Waiting for sensor...";
+        if (temperatureStatus) {
+            temperatureStatus.textContent = "Waiting for sensor...";
+        }
     }
+
+    updateConnectionStatus();
+
 
 }, 1000);
 
+// 10. FEED NOW
 
-// ========================================
-// FEED NOW
-// ========================================
+if (feedButton) {
+    feedButton.addEventListener("click", function () {
+        if (!client || !client.connected) {
+            if (feedStatus) {
+                feedStatus.textContent = "MQTT connection unavailable.";
+            }
 
-feedButton.addEventListener("click", function () {
 
-    if (!client.connected) {
+            return;
+        }
 
-        feedStatus.textContent =
-            "⚠️ Feeder connection unavailable";
+        if (!espOnline) {
+            if (feedStatus) {
+                feedStatus.textContent = "ESP32 is offline.";
+            }
 
-        return;
+            return;
+        }
+
+        if (feedingInProgress) {
+            return;
+        }
+
+        feedingInProgress = true;
+        feedButton.disabled = true;
+        feedButton.textContent = "SENDING...";
+
+        if (feedStatus) {
+            feedStatus.textContent = "Sending feeding command...";
+        }
+
+        client.publish(
+            feedTopic,
+            "FEED",
+            { qos: 1 },
+            function (error) {
+                if (error) {
+                    console.error("Failed to send feeding command:", error);
+
+                    if (feedStatus) {
+                        feedStatus.textContent =
+                            "Failed to send feeding command.";
+                    }
+
+                    feedingInProgress = false;
+                    feedButton.disabled = false;
+                    feedButton.textContent = "FEED NOW";
+
+                    return;
+                }
+
+                feedButton.textContent = "COMMAND SENT";
+
+                if (feedStatus) {
+                    feedStatus.textContent =
+                        "Command sent. Waiting for device.";
+                }
+
+                setTimeout(function () {
+                    feedingInProgress = false;
+                    feedButton.disabled = false;
+                    feedButton.textContent = "FEED NOW";
+
+                    if (feedStatus) {
+                        feedStatus.textContent = espOnline
+                            ? "Feeder ready"
+                            : "ESP32 is offline.";
+                    }
+                }, 3000);
+            }
+        );
+    });
+
+
+}
+
+// 11. FEEDING SCHEDULE
+
+if (scheduleButton) {
+    scheduleButton.addEventListener("click", function () {
+        const time = feedingTime ? feedingTime.value : "";
+
+
+        if (!time) {
+            if (scheduleStatus) {
+                scheduleStatus.textContent =
+                    "Please select a feeding time.";
+            }
+
+            return;
+        }
+
+        if (!client || !client.connected) {
+            if (scheduleStatus) {
+                scheduleStatus.textContent =
+                    "MQTT connection unavailable.";
+            }
+
+            return;
+        }
+
+        if (!espOnline) {
+            if (scheduleStatus) {
+                scheduleStatus.textContent = "ESP32 is offline.";
+            }
+
+            return;
+        }
+
+        scheduleButton.disabled = true;
+
+        if (scheduleStatus) {
+            scheduleStatus.textContent = "Sending schedule...";
+        }
+
+        client.publish(
+            scheduleTopic,
+            time,
+            { qos: 1 },
+            function (error) {
+                scheduleButton.disabled = false;
+
+                if (error) {
+                    console.error("Failed to send schedule:", error);
+
+                    if (scheduleStatus) {
+                        scheduleStatus.textContent =
+                            "Failed to send schedule.";
+                    }
+
+                    return;
+                }
+
+                if (nextFeedingTime) {
+                    nextFeedingTime.textContent = time;
+                }
+
+                if (scheduleStatus) {
+                    scheduleStatus.textContent =
+                        "Schedule command sent.";
+                }
+
+                console.log("Schedule command sent:", time);
+            }
+        );
+    });
+
+
+}
+
+// 12. CLEANUP
+
+window.addEventListener("beforeunload", function () {
+    if (client) {
+        client.end(true);
     }
-
-    if (!espStatus.classList.contains("online")) {
-
-        feedStatus.textContent =
-            "⚠️ ESP32 is offline";
-
-        return;
-    }
-
-    client.publish(
-        feedTopic,
-        "FEED"
-    );
-
-    feedButton.textContent =
-        "FEEDING...";
-
-    feedButton.disabled = true;
-
-    feedStatus.textContent =
-        "🐟 Feeding command sent";
-
-
-    setTimeout(function () {
-
-        feedButton.textContent =
-            "FEED NOW";
-
-        feedButton.disabled = false;
-
-        feedStatus.textContent =
-            "Feeder ready";
-
-    }, 3000);
 });
-
-
-// ========================================
-// FEEDING SCHEDULE
-// ========================================
-
-scheduleButton.addEventListener("click", function () {
-
-    const time = feedingTime.value;
-
-
-    if (!time) {
-
-        scheduleStatus.textContent =
-            "⚠️ Please select feeding time";
-
-        return;
-    }
-
-
-    if (!client.connected) {
-
-        scheduleStatus.textContent =
-            "⚠️ Feeder connection unavailable";
-
-        return;
-    }
-
-
-    if (!espStatus.classList.contains("online")) {
-
-        scheduleStatus.textContent =
-            "⚠️ ESP32 is offline";
-
-        return;
-    }
-
-
-    client.publish(
-        scheduleTopic,
-        time
-    );
-
-    nextFeedingTime.textContent =
-        time;
-
-    scheduleStatus.textContent =
-        "⏰ Schedule active";
-
-    console.log(
-        "⏰ Feeding schedule sent:",
-        time
-    );
-});
-
-
-// ========================================
-// INITIAL STATUS
-// ========================================
-
-setStatus(
-    espStatus,
-    "Offline",
-    false
-);
-
-setStatus(
-    sensorStatus,
-    "Waiting",
-    false
-);
-
-setStatus(
-    feederStatus,
-    "Offline",
-    false
-);
-
-updateConnectionStatus();

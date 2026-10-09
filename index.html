@@ -5,271 +5,603 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>TechAquarium</title>
+    <meta name="theme-color" content="#06101f">
+    <meta name="description"
+        content="TechAquarium — Smart Aquarium System untuk monitoring temperatur dan kontrol pemberian pakan ikan secara otomatis.">
+
+    <title>TechAquarium | Smart Aquarium System</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
-
-    <!-- =========================
-         HEADER
-    ========================== -->
-
-    <header>
-
-        <div class="header-content">
-
-            <div>
-                <h1>🐟 TechAquarium</h1>
-                <p>Smart Aquarium System</p>
-            </div>
-
-            <!-- Connection Status -->
-            <div id="connectionStatus" class="connection-status offline">
-
-                <span id="connectionDot" class="connection-dot"></span>
-
-                <span id="connectionText">
-                    System Offline
-                </span>
-
-            </div>
-
-        </div>
-
-    </header>
-
-
-    <!-- =========================
-         MAIN DASHBOARD
-    ========================== -->
-
-    <main>
-
-
-        <!-- =========================
-             TEMPERATURE
-        ========================== -->
-
-        <section class="card">
-
-            <h2>🌡️ Temperature</h2>
-
-            <div class="temperature-box">
-
-                <p id="temperature">
-                    -- °C
-                </p>
-
-                <p id="temperature-status">
-                    Waiting for sensor...
-                </p>
-
-            </div>
-
-        </section>
-
-
-        <!-- =========================
-             FEEDING CONTROL
-        ========================== -->
-
-        <section class="card">
-
-            <h2>🍽️ Feeding Control</h2>
-
-            <button id="feedButton">
-                FEED NOW
-            </button>
-
-            <p id="feedStatus">
-                Feeder ready
-            </p>
-
-        </section>
-
-
-        <!-- =========================
-             FEEDING SCHEDULE
-        ========================== -->
-
-        <section class="card">
-
-            <h2>⏰ Feeding Schedule</h2>
-
-            <p class="label">
-                Next Feeding
-            </p>
-
-            <p id="nextFeeding">
-                --:--
-            </p>
-
-            <div class="schedule-control">
-
-                <input type="time" id="feedingTime">
-
-                <button id="scheduleButton">
-                    SET SCHEDULE
-                </button>
-
-            </div>
-
-            <p id="scheduleStatus">
-                No schedule set
-            </p>
-
-        </section>
-
-
-        <!-- =========================
-             SYSTEM STATUS
-        ========================== -->
-
-        <section class="card">
-
-            <h2>⚙️ System Status</h2>
-
-
-            <!-- ESP32 -->
-
-            <div class="status-row">
-
-                <span>
-                    ESP32
-                </span>
-
-                <span id="espStatus" class="status offline">
-                    Offline
-                </span>
-
-            </div>
-
-
-            <!-- Temperature Sensor -->
-
-            <div class="status-row">
-
-                <span>
-                    Temperature Sensor
-                </span>
-
-                <span id="sensorStatus" class="status offline">
-                    Waiting
-                </span>
-
-            </div>
-
-
-            <!-- Feeder -->
-
-            <div class="status-row">
-
-                <span>
-                    Feeder
-                </span>
-
-                <span id="feederStatus" class="status online">
-                    Ready
-                </span>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <!-- =========================
-         MQTT LIBRARY
-    ========================== -->
-
-    <script src="https://cdn.jsdelivr.net/npm/mqtt/dist/mqtt.min.js"></script>
-
-
-    <!-- =========================
-         TECHAQUARIUM SCRIPT
-    ========================== -->
-
-    <script src="script.js"></script>
-
-
-    <!-- =========================
-         HEADER CONNECTION STATUS
-         SYNC
-    ========================== -->
-
-    <script>
-
-        const espStatus =
-            document.getElementById("espStatus");
-
-        const connectionStatus =
-            document.getElementById("connectionStatus");
-
-        const connectionText =
-            document.getElementById("connectionText");
-
-
-        function updateConnectionStatus() {
-
-            if (
-                espStatus.classList.contains("online")
-            ) {
-
-                connectionStatus.classList.remove(
-                    "offline"
-                );
-
-                connectionStatus.classList.add(
-                    "online"
-                );
-
-                connectionText.textContent =
-                    "System Online";
-
-            } else {
-
-                connectionStatus.classList.remove(
-                    "online"
-                );
-
-                connectionStatus.classList.add(
-                    "offline"
-                );
-
-                connectionText.textContent =
-                    "System Offline";
-            }
+<style>
+    /* ==========================================
+       TECHAQUARIUM — DASHBOARD LAYOUT
+    ========================================== */
+
+    [hidden] {
+        display: none !important;
+    }
+
+    .dashboard {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 32px 0 24px;
+        box-sizing: border-box;
+    }
+
+    /* WELCOME SECTION */
+
+    .dashboard-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+        align-items: center;
+        gap: 32px;
+        width: 100%;
+        min-height: 220px;
+        margin: 0 0 36px;
+        padding: 36px 40px;
+        box-sizing: border-box;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        min-width: 0;
+    }
+
+    .hero-content h2 {
+        max-width: 600px;
+        line-height: 1.2;
+    }
+
+    .hero-content>p {
+        max-width: 540px;
+        line-height: 1.7;
+    }
+
+    .hero-side {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        min-height: 140px;
+    }
+
+    .hero-decoration {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    /* SECTION HEADING */
+
+    .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        width: 100%;
+        margin: 0 0 22px;
+    }
+
+    .section-heading h2 {
+        margin: 6px 0 0;
+    }
+
+    .live-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        flex-shrink: 0;
+    }
+
+    /* FOUR DASHBOARD CARDS */
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+        gap: 22px;
+        width: 100%;
+    }
+
+    .dashboard-card {
+        width: 100%;
+        min-width: 0;
+        min-height: 340px;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    .temperature-card,
+    .feed-card,
+    .schedule-card,
+    .status-card {
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    /* CARD HEADERS */
+
+    .card-head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .card-head>div {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .card-head h2 {
+        margin: 0;
+    }
+
+    .card-number {
+        flex-shrink: 0;
+        margin-left: auto;
+    }
+
+    /* TEMPERATURE */
+
+    .temperature-box {
+        margin-top: 24px;
+    }
+
+    .temperature-reading #temperature {
+        font-size: clamp(36px, 4vw, 54px);
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    /* FEEDER */
+
+    .feed-visual {
+        min-height: 150px;
+    }
+
+    /* FEEDING SCHEDULE */
+
+    .schedule-control {
+        display: flex;
+        align-items: stretch;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .time-field {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .time-field input {
+        width: 100%;
+        min-height: 46px;
+        box-sizing: border-box;
+    }
+
+    #scheduleButton {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 46px;
+        padding: 10px 16px;
+        flex-shrink: 0;
+    }
+
+    #scheduleButton svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* SYSTEM STATUS */
+
+    .status-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin: 24px 0;
+    }
+
+    .status-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .status-device {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .status-name {
+        overflow-wrap: anywhere;
+    }
+
+    /* FOOTER */
+
+    .dashboard-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px 24px;
+        width: 100%;
+        margin-top: 36px;
+        padding: 22px 0;
+        box-sizing: border-box;
+    }
+
+    .dashboard-footer p {
+        margin: 0;
+    }
+
+    /* ==========================================
+       TABLET
+    ========================================== */
+
+    @media (max-width: 800px) {
+        .dashboard {
+            width: calc(100% - 32px);
+            padding-top: 24px;
         }
 
+        .dashboard-hero {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 16px;
+            padding: 28px 24px;
+        }
 
-        // Initial state
+        .hero-side {
+            min-height: 100px;
+        }
 
-        updateConnectionStatus();
+        .dashboard-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .dashboard-card {
+            min-height: 320px;
+        }
+
+        .schedule-control {
+            flex-direction: column;
+        }
+
+        #scheduleButton {
+            width: 100%;
+        }
+    }
+
+    /* ==========================================
+       MOBILE
+    ========================================== */
+
+    @media (max-width: 560px) {
+        .dashboard {
+            width: calc(100% - 24px);
+            padding-top: 18px;
+        }
+
+        .dashboard-hero {
+            padding: 24px 20px;
+            margin-bottom: 28px;
+        }
+
+        .section-heading {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dashboard-grid {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 16px;
+        }
+
+        .dashboard-card {
+            min-height: auto;
+            padding: 22px;
+        }
+
+        .temperature-card,
+        .feed-card,
+        .schedule-card,
+        .status-card {
+            width: 100%;
+        }
+
+        .feed-visual {
+            min-height: 120px;
+        }
+
+        .schedule-control {
+            flex-direction: column;
+        }
+
+        #scheduleButton {
+            width: 100%;
+        }
+
+        .dashboard-footer {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+</style>
+</head>
+
+<body>
+    <div class="ambient" aria-hidden="true">
+        <div class="caustic"></div>
+        <div class="ambient-glow"></div>
+        <div class="water-grid"></div>
+        <div class="ambient-vignette"></div>
+        <span class="bubble b1"></span>
+        <span class="bubble b2"></span>
+        <span class="bubble b3"></span>
+        <span class="bubble b4"></span>
+        <span class="bubble b5"></span>
+        <span class="bubble b6"></span>
+        <span class="bubble b7"></span>
+    </div>
 
 
-        // Watch changes made by script.js
+    <section class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-brand">
+                <div class="login-logo">TA</div>
+                <span>TECH<span>AQUARIUM</span></span>
+            </div>
 
-        const statusObserver =
-            new MutationObserver(() => {
+            <div class="login-heading">
+                <p class="hero-eyebrow">SMART AQUARIUM SYSTEM</p>
+                <h1>Welcome to<br><span>your aquarium.</span></h1>
+                <p>Monitor your aquarium. Control feeding. Keep your fish happy.</p>
+            </div>
 
-                updateConnectionStatus();
+            <form id="loginForm">
+                <label class="login-field" for="loginUsername">Your name</label>
+                <input type="text" id="loginUsername" name="username" placeholder="Enter your name"
+                    autocomplete="given-name" maxlength="40" required>
+                <p id="loginStatus" role="status" aria-live="polite"></p>
+                <button type="submit" id="loginButton">Enter Dashboard <span>→</span></button>
+            </form>
 
+            <p class="login-note">A smarter way to care for your aquatic life.</p>
+        </div>
+    </section>
+
+    <section class="app-screen" id="appScreen" hidden>
+        <header class="app-topbar">
+            <div class="topbar">
+                <div class="brand">
+                    <div class="logo">TA</div>
+                    <div>
+                        <h2>TechAquarium</h2>
+                        <p>SMART AQUARIUM SYSTEM</p>
+                    </div>
+                </div>
+
+                <div class="profile-area">
+                    <span id="profileName">Aquarium Owner</span>
+                    <div class="connection-status">
+                        <span class="connection-dot" id="connectionDot"></span>
+                        <span id="connectionText">MQTT Disconnected</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <section class="dashboard-hero hero">
+                <div class="hero-content">
+                    <p class="hero-eyebrow">YOUR AQUARIUM AT A GLANCE</p>
+                    <h2>Everything under<br>control<span>.</span></h2>
+                    <p>Keep track of your aquarium temperature and manage your fish feeding from one place.</p>
+                    <div class="live-badge">
+                        <span class="connection-dot"></span>
+                        REAL-TIME MONITORING
+                    </div>
+                </div>
+
+                <div class="hero-side" aria-hidden="true">
+                    <div class="hero-decoration">
+                        <div class="hero-orbit orbit-one"></div>
+                        <div class="hero-orbit orbit-two"></div>
+                        <div class="hero-fish">🐠</div>
+                        <div class="hero-water">〰</div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="section-heading">
+                    <div>
+                        <p class="hero-eyebrow">AQUARIUM OVERVIEW</p>
+                        <h2>System dashboard</h2>
+                    </div>
+                    <span class="live-badge"><span class="connection-dot"></span> Live status</span>
+                </div>
+
+                <div class="dashboard-grid dashboard-cards">
+                    <article class="card dashboard-card temperature-card">
+                        <div class="card-head">
+                            <div class="icon-badge">🌡️</div>
+                            <div>
+                                <p class="card-kicker">ENVIRONMENT</p>
+                                <h2>Water temperature</h2>
+                            </div>
+                            <span class="card-number">01</span>
+                        </div>
+
+                        <div class="temperature-box">
+                            <div class="temperature-reading">
+                                <span id="temperature">--.- °C</span>
+                            </div>
+                            <p id="temperature-status">Waiting for sensor...</p>
+                        </div>
+
+                        <div class="temp-scale">
+                            <span>LIVE SENSOR READING</span>
+                            <span>DS18B20</span>
+                        </div>
+                        <div class="temp-track">
+                            <div class="temp-fill"></div>
+                        </div>
+                    </article>
+
+                    <article class="card dashboard-card feed-card">
+                        <div class="card-head">
+                            <div class="icon-badge">🐟</div>
+                            <div>
+                                <p class="card-kicker">FEEDING CONTROL</p>
+                                <h2>Feed your fish</h2>
+                            </div>
+                            <span class="card-number">02</span>
+                        </div>
+
+                        <div class="feed-visual">
+                            <div class="feed-particles"></div>
+                            <div class="feed-fish">🐠</div>
+                            <p>One tap. Fresh feed.</p>
+                        </div>
+
+                        <button type="button" id="feedButton">FEED NOW</button>
+                        <p id="feedStatus" role="status" aria-live="polite">Feeder ready</p>
+                    </article>
+
+                    <article class="card dashboard-card schedule-card">
+                        <div class="card-head">
+                            <div class="icon-badge">🕒</div>
+                            <div>
+                                <p class="card-kicker">AUTOMATION</p>
+                                <h2>Feeding schedule</h2>
+                            </div>
+                            <span class="card-number">03</span>
+                        </div>
+
+                        <div class="next-feed">
+                            <p>NEXT SCHEDULED FEEDING</p>
+                            <h3 id="nextFeeding">Not scheduled</h3>
+                        </div>
+
+                        <label class="time-field" for="feedingTime">
+                            <span>Choose feeding time</span>
+                            <input type="time" id="feedingTime" required>
+                        </label>
+
+                        <div class="schedule-control">
+                            <button type="button" id="scheduleButton">Set schedule →</button>
+                        </div>
+                        <p id="scheduleStatus" role="status" aria-live="polite">No schedule sent</p>
+                    </article>
+
+                    <article class="card dashboard-card status-card">
+                        <div class="card-head">
+                            <div class="icon-badge">📡</div>
+                            <div>
+                                <p class="card-kicker">CONNECTIVITY</p>
+                                <h2>System status</h2>
+                            </div>
+                            <span class="card-number">04</span>
+                        </div>
+
+                        <div class="status-list">
+                            <div class="status-row">
+                                <div class="status-device">
+                                    <span class="connection-dot"></span>
+                                    <span class="status-name">ESP32 Controller</span>
+                                </div>
+                                <span class="status offline" id="espStatus">Offline</span>
+                            </div>
+
+                            <div class="status-row">
+                                <div class="status-device">
+                                    <span class="connection-dot"></span>
+                                    <span class="status-name">Temperature sensor</span>
+                                </div>
+                                <span class="status offline" id="sensorStatus">Waiting</span>
+                            </div>
+
+                            <div class="status-row">
+                                <div class="status-device">
+                                    <span class="connection-dot"></span>
+                                    <span class="status-name">Feeder mechanism</span>
+                                </div>
+                                <span class="status offline" id="feederStatus">Offline</span>
+                            </div>
+
+                            <div class="status-row">
+                                <div class="status-device">
+                                    <span class="connection-dot"></span>
+                                    <span class="status-name">MQTT connection</span>
+                                </div>
+                                <span class="status offline" id="connectionStatus">System Offline</span>
+                            </div>
+                        </div>
+
+                        <p class="status-note">Device status updates automatically when new data arrives.</p>
+                    </article>
+                </div>
+            </section>
+
+            <footer class="dashboard-footer">
+                <p>© 2026 TechAquarium</p>
+                <p>TURNING TECHNOLOGY INTO BETTER AQUATIC CARE.</p>
+            </footer>
+        </main>
+    </section>
+
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const nameInput = document.getElementById("loginUsername");
+        const profileName = document.getElementById("profileName");
+
+        if (nameInput && profileName) {
+            nameInput.addEventListener("input", function () {
+                const name = nameInput.value.trim();
+                profileName.textContent = name || "Aquarium Owner";
             });
+        }
 
+        const connectionObserverTarget = document.getElementById("connectionStatus");
+        const connectionDot = document.getElementById("connectionDot");
 
-        statusObserver.observe(
-            espStatus,
-            {
-                attributes: true,
-                childList: true,
-                subtree: true
-            }
-        );
+        if (connectionObserverTarget && connectionDot) {
+            const updateConnectionDot = function () {
+                const online = connectionObserverTarget.classList.contains("online");
+                connectionDot.classList.toggle("online", online);
+                connectionDot.classList.toggle("offline", !online);
+            };
 
+            new MutationObserver(updateConnectionDot).observe(
+                connectionObserverTarget,
+                { attributes: true, attributeFilter: ["class"], childList: true }
+            );
+
+            updateConnectionDot();
+        }
     </script>
+
 
 </body>
 
